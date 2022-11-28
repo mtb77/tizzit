@@ -77,6 +77,13 @@ public class JAASRealmLoginManager implements SafeguardLoginManager {
 					if (principal instanceof Group) {
 						Group group = (Group) principal;
 						if (group.getName().equalsIgnoreCase("roles")) {
+							Enumeration e=group.members();
+							while (e.hasMoreElements()) {
+								Principal p = (Principal) e.nextElement();
+								if(p.getName().equalsIgnoreCase(requiredRole.getName())){
+									login = SafeguardLoginManager.LOGIN_SUCCESSFULLY;
+								}
+							}
 							if (group.isMember(requiredRole)) login = SafeguardLoginManager.LOGIN_SUCCESSFULLY;
 						}
 						if (log.isDebugEnabled()) {
@@ -92,7 +99,6 @@ public class JAASRealmLoginManager implements SafeguardLoginManager {
 				login = SafeguardLoginManager.LOGIN_SUCCESSFULLY;
 			}
 			if (log.isDebugEnabled()) log.debug("user \"" + this.userName + "\" at realm " + this.realmId + " is logedin: " + login);
-			lc.logout();
 		} catch (LoginException e) {
 			log.error("Error loging in user " + this.userName + " on JaasRealm " + this.realmId + ": " + e.getMessage(), e);
 		}
